@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"strings"
 
@@ -33,10 +34,10 @@ func fetchMyUserInfo(bot string, api slack.Client) (*slack.Bot, error) {
 func extractShellgei(msg slack.Msg, self slack.UserDetails, api *slack.Client) (string, []string, error) {
 	text := msg.Text
 	if len(text) == 0 {
-		return "", []string{""}, errors.New("Message is without text")
+		return "", []string{""}, errors.New("Message without text")
 	}
 
-	text = strings.Replace(text, "<"+self.ID+">", "", -1)
+	text = strings.Replace(text, fmt.Sprintf("<@%s>", self.ID), "", -1)
 
 	// Extract files and fetch public URLs
 	fileURLs := make([]string, 0, 4)
@@ -66,7 +67,7 @@ func postResult(api *slack.Client, msg slack.Msg, result string, b64imgs []strin
 			return err
 		}
 	}
-	_, _, err := api.PostMessage(msg.Channel, slack.MsgOptionText("internal error", true))
+	_, _, err := api.PostMessage(msg.Channel, slack.MsgOptionText(result, true))
 	if err != nil {
 		return err
 	}

@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/mattn/go-sixel"
 	_ "github.com/mattn/go-sqlite3"
@@ -21,12 +22,19 @@ import (
 )
 
 func processMessage(msg slack.Msg, self slack.UserDetails, api *slack.Client, db *sql.DB, config botConfig) {
+	fmt.Printf("msg.User: %s, msg.BotID: %s, self.ID: %s, msg.Text: %s\n", msg.User, msg.BotID, self.ID, msg.Text)
 	// check if it is valid shellgei tweet
-	if self.ID == msg.User {
+	if msg.User == "" {
+		return
+	}
+
+	// is mentioned?
+	if !strings.Contains(msg.Text, fmt.Sprintf("<@%s>", self.ID)) {
 		return
 	}
 
 	text, mediaUrls, err := extractShellgei(msg, self, api)
+	fmt.Printf("text: %s\n", text)
 	if err != nil {
 		log.Println(err)
 		return
@@ -36,11 +44,11 @@ func processMessage(msg slack.Msg, self slack.UserDetails, api *slack.Client, db
 
 	result, b64imgs, err := runCmd(text, mediaUrls, config)
 	//insertResult(db, msg.Timestamp, result, err)
+	fmt.Printf("result: %s\n", result)
 
 	if err != nil {
-		if err.(*stdError) == nil {
-			_, _, _ = api.PostMessage(msg.Channel, slack.MsgOptionText("internal error", true))
-		}
+		_, _, _ = api.PostMessage(msg.Channel, slack.MsgOptionText("internal error", true))
+		fmt.Println(err)
 		return
 	}
 
@@ -96,7 +104,15 @@ func botMain(slackConfigFile, botConfigFile string) {
 			}
 
 			go func() {
-				processMessage(msg.Data.(slack.Msg), self, api, db, config)
+				messageEvent := msg.Data.(*slack.MessageEvent)
+
+				message := slack.Msg{
+					Text:      messageEvent.Text,
+					User:      messageEvent.User,
+					Channel:   messageEvent.Channel,
+					Timestamp: messageEvent.Timestamp,
+				}
+				processMessage(message, self, api, db, config)
 			}()
 		}
 	}
