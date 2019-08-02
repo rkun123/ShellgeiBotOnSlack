@@ -1,29 +1,19 @@
-# ShellGeiBot
+# ShellGeiBotOnSlack
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/theoldmoon0602/ShellgeiBot)](https://goreportcard.com/report/github.com/theoldmoon0602/ShellgeiBot)
+It is fork of [ShellGeiBot](https://github.com/theoldmoon0602/ShellgeiBot) for Slack.
 
-## Twitter
+## Todo
 
-- [@minyoruminyon](https://twitter.com/minyoruminyon)
-
-## Specification
-
-- https://furutsuki.hatenablog.com/entry/2018/07/13/221806
-
-## Official Docker Image
-
-- DockerHub: https://hub.docker.com/r/theoldmoon0602/shellgeibot
-- GitHub: https://github.com/theoldmoon0602/ShellgeiBot-Image
-
-## 3rd parties
-
-- SGWeb (https://shellgei-web.net) by [@kekeho](https://github.com/kekeho): https://github.com/kekeho/SGWeb
+- データベース
+- 画像読み込み
+- 画像出力
+- Markdownとしてパースされちゃう問題解決
 
 ## Author
 
-theoldmooon0602
+[@rkunkunr](https://twitter.com/rkunkunr)
 
 ## LICENSE
 
-Apache License
+Apache License 2.0
 
