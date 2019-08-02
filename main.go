@@ -13,50 +13,33 @@ import (
 	_ "image/png"
 	"io/ioutil"
 	"log"
-	"net/url"
 	"os"
-	"strings"
 
-	"github.com/ChimeraCoder/anaconda"
 	"github.com/mattn/go-sixel"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/nlopes/slack"
 )
 
-func processTweet(tweet anaconda.Tweet, self anaconda.User, api *anaconda.TwitterApi, db *sql.DB, config botConfig) {
+func processMessage(msg slack.Msg, self slack.UserDetails, api *slack.Client, db *sql.DB, config botConfig) {
 	// check if it is valid shellgei tweet
-	if tweet.RetweetedStatus != nil {
-		return
-	}
-	if !isShellGeiTweet(tweet, config.Tags) {
-		return
-	}
-	if self.Id == tweet.User.Id {
-		return
-	}
-	if !isFollower(api, tweet) {
+	if self.ID == msg.User {
 		return
 	}
 
-	t, err := tweet.CreatedAtTime()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	text, mediaUrls, err := extractShellgei(tweet, self, api, config.Tags,[]int64{})
+	text, mediaUrls, err := extractShellgei(msg, self, api)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	insertShellGei(db, tweet.User.Id, tweet.User.ScreenName, tweet.Id, text, t.Unix())
+	//insertShellGei(db, msg.User, msg.Username, msg.Timestanp, text, t.Unix())
 
 	result, b64imgs, err := runCmd(text, mediaUrls, config)
-	result = makeTweetable(result)
-	insertResult(db, tweet.Id, result, err)
+	//insertResult(db, msg.Timestamp, result, err)
 
 	if err != nil {
 		if err.(*stdError) == nil {
-			_, _ = api.PostTweet("@theoldmoon0602 internal error", url.Values{})
+			_, _, _ = api.PostMessage(msg.Channel, slack.MsgOptionText("internal error", true))
 		}
 		return
 	}
@@ -65,7 +48,7 @@ func processTweet(tweet anaconda.Tweet, self anaconda.User, api *anaconda.Twitte
 		return
 	}
 
-	err = tweetResult(api, tweet, result, b64imgs)
+	err = postResult(api, msg, result, b64imgs)
 	if err != nil {
 		log.Println(err)
 	}
@@ -73,8 +56,8 @@ func processTweet(tweet anaconda.Tweet, self anaconda.User, api *anaconda.Twitte
 }
 
 /// ShellgeiBot main function
-func botMain(twitterConfigFile, botConfigFile string) {
-	twitterKey, err := parseTwitterKey(twitterConfigFile)
+func botMain(slackConfigFile, botConfigFile string) {
+	token, err := parseSlackKey(slackConfigFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,35 +68,35 @@ func botMain(twitterConfigFile, botConfigFile string) {
 	}
 	_, _ = db.Exec(schema)
 
-	anaconda.SetConsumerKey(twitterKey.ConsumerKey)
-	anaconda.SetConsumerSecret(twitterKey.ConsumerSecret)
-	api := anaconda.NewTwitterApi(twitterKey.AccessToken, twitterKey.AccessSecret)
-
-	v := url.Values{}
-	self, err := api.GetSelf(v)
-	if err != nil {
-		log.Fatal(err)
-	}
+	api := slack.New(token)
 
 	config, err := parseBotConfig(botConfigFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	v.Set("track", strings.Join(config.Tags, ","))
-	stream := api.PublicStreamFilter(v)
 
-	for {
-		t := <-stream.C
-		switch tweet := t.(type) {
-		case anaconda.Tweet:
+	self := slack.UserDetails{}
+	rtm := api.NewRTM()
+	go rtm.ManageConnection()
+
+	for msg := range rtm.IncomingEvents {
+		fmt.Println("Event Received!!")
+		switch ev := msg.Data.(type) {
+
+		case *slack.ConnectedEvent:
+			fmt.Println("Infos:", ev.Info)
+			self = *ev.Info.User
+			fmt.Println("Connection counter:", ev.ConnectionCount)
+
+		case *slack.MessageEvent:
 			config, err = parseBotConfig(botConfigFile)
 			if err != nil {
-				_, _ = api.PostTweet("@theoldmoon0602 Internal error", v)
+				rtm.SendMessage(rtm.NewOutgoingMessage("Internal Error", ev.Channel))
 				log.Fatal(err)
 			}
 
 			go func() {
-				processTweet(tweet, self, api, db, config)
+				processMessage(msg.Data.(slack.Msg), self, api, db, config)
 			}()
 		}
 	}
@@ -131,7 +114,6 @@ func botTest(botConfigFile, scriptFile string) {
 	}
 
 	result, b64imgs, err := runCmd(string(script), []string{}, config)
-	result = makeTweetable(result)
 
 	if err != nil {
 		if err.(*stdError) == nil {
