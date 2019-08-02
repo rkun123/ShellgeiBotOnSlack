@@ -2,62 +2,6 @@
 
 
 [[projects]]
-  digest = "1:e82bb4a4de56669b0b23751e0a9fc5af166f99423a22c2ec8960ca694632dbec"
-  name = "github.com/ChimeraCoder/anaconda"
-  packages = ["."]
-  pruneopts = ""
-  revision = "0cb3e4c3ff8c6df5c73d5058c64e9c4eb6299c4b"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:cd4a8ff5146935d92d29502a4b8ab538a2d29168669e00bf1192637fa11051b4"
-  name = "github.com/ChimeraCoder/tokenbucket"
-  packages = ["."]
-  pruneopts = ""
-  revision = "c5a927568de7aad8a58127d80bcd36ca4e71e454"
-
-[[projects]]
-  branch = "master"
-  digest = "1:650520e175941762d4781168477eda2561c4e24fb0b0578761dda5b0e1382237"
-  name = "github.com/azr/backoff"
-  packages = ["."]
-  pruneopts = ""
-  revision = "53511d3c733003985b0b76f733df1f4d0095ee6a"
-
-[[projects]]
-  digest = "1:0deddd908b6b4b768cfc272c16ee61e7088a60f7fe2f06c547bd3d8e1f8b8e77"
-  name = "github.com/davecgh/go-spew"
-  packages = ["spew"]
-  pruneopts = ""
-  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
-  version = "v1.1.1"
-
-[[projects]]
-  branch = "master"
-  digest = "1:5a57f88a1196908f330b6b10340aaa34b5594183e80a7659cac1bfbb3a88d84e"
-  name = "github.com/dustin/go-jsonpointer"
-  packages = ["."]
-  pruneopts = ""
-  revision = "ba0abeacc3dcca5b9b20f31509c46794edbc9965"
-
-[[projects]]
-  branch = "master"
-  digest = "1:9140f1215e69e5b5f05ee4faf473f8532f8a62b2588c55f6ab4f467c31b5a5f8"
-  name = "github.com/dustin/gojson"
-  packages = ["."]
-  pruneopts = ""
-  revision = "2e71ec9dd5adce3b168cd0dbde03b5cc04951c30"
-
-[[projects]]
-  branch = "master"
-  digest = "1:557298cd915bb516580cc31452733e8bc48a21b029696f45e7ea2efc1d370af0"
-  name = "github.com/garyburd/go-oauth"
-  packages = ["oauth"]
-  pruneopts = ""
-  revision = "4cff9ef7b7003713efa191899dbaab8fa75e3e73"
-
-[[projects]]
   digest = "1:09aa5dd1332b93c96bde671bafb053249dc813febf7d5ca84e8f382ba255d67d"
   name = "github.com/gorilla/websocket"
   packages = ["."]
@@ -101,14 +45,6 @@
   version = "v0.8.1"
 
 [[projects]]
-  digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
-  name = "github.com/pmezard/go-difflib"
-  packages = ["difflib"]
-  pruneopts = ""
-  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
-  version = "v1.0.0"
-
-[[projects]]
   digest = "1:9a4867a962086c10a4d4ee2dc1ba4b349f92d6a1458b4e573fb06c54c04a5bdd"
   name = "github.com/soniakeys/quant"
   packages = [
@@ -119,14 +55,6 @@
   pruneopts = ""
   revision = "0a3861b3bd925b434c67c93a15633ced8475092d"
   version = "v1.0.0"
-
-[[projects]]
-  digest = "1:381bcbeb112a51493d9d998bbba207a529c73dbb49b3fd789e48c63fac1f192c"
-  name = "github.com/stretchr/testify"
-  packages = ["assert"]
-  pruneopts = ""
-  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
-  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -140,11 +68,9 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/ChimeraCoder/anaconda",
     "github.com/mattn/go-sixel",
     "github.com/mattn/go-sqlite3",
     "github.com/nlopes/slack",
-    "github.com/stretchr/testify/assert",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
