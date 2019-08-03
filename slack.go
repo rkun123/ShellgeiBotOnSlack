@@ -67,7 +67,7 @@ func postResult(api *slack.Client, msg slack.Msg, result string, b64imgs []strin
 			return err
 		}
 	}
-	_, _, err := api.PostMessage(msg.Channel, slack.MsgOptionText(result, true))
+	_, _, err := api.PostMessage(msg.Channel, slack.MsgOptionText(result, true), slack.MsgOptionDisableMarkdown())
 	if err != nil {
 		return err
 	}
